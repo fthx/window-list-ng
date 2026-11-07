@@ -447,8 +447,8 @@ class EditableMenuItem extends PopupMenu.PopupBaseMenuItem {
             this._entry, 'text',
             GObject.BindingFlags.DEFAULT);
 
-        this._entry.clutter_text.connect('activate',
-            () => this._stopEditing());
+        this._entry.clutter_text.connectObject('activate',
+            () => this._stopEditing(), this);
 
         this._editButton = new St.Button({
             style_class: 'icon-button flat',

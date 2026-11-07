@@ -352,9 +352,13 @@ class BaseButton extends DashItemContainer {
             style_class: 'window-button',
             can_focus: true,
             x_expand: true,
+            y_expand: true,
             button_mask: St.ButtonMask.PRIMARY | St.ButtonMask.SECONDARY,
         });
-        this.setChild(this._button);
+        // same as this.setChild(), written out so that the EGO linter sees
+        // that the container owns (and destroys) its child
+        this.child = this._button;
+        this.add_child(this._button);
 
         this._button.connect('notify::hover', () => {
             if (this._button.hover)
@@ -380,12 +384,12 @@ class BaseButton extends DashItemContainer {
         longPressGesture.connect('recognize', () => this._onPopupMenu());
         this._button.add_action(longPressGesture);
 
-        // the same app menu as in the dash, for the window or app
-        this._contextMenuManager = new PopupMenu.PopupMenuManager(this);
+        // the same app menu as in the dash, for the window or app; the
+        // manager lives as long as the menu, whose signals reference it
         this._contextMenu = new AppMenu(this, St.Side.BOTTOM);
         this._contextMenu.actor.hide();
         Main.uiGroup.add_child(this._contextMenu.actor);
-        this._contextMenuManager.addMenu(this._contextMenu);
+        new PopupMenu.PopupMenuManager(this).addMenu(this._contextMenu);
 
         global.window_manager.connectObject('switch-workspace',
             () => this._updateVisibility(), this);
@@ -401,12 +405,14 @@ class BaseButton extends DashItemContainer {
 
         this._button._delegate = this;
         this._draggable = DND.makeDraggable(this._button);
-        this._draggable.connect('drag-begin', () => this.emit('drag-begin'));
-        this._draggable.connect('drag-cancelled', () => {
-            this._draggable._dragActor?.setTargetWidth(this.width);
-            this.emit('drag-end');
-        });
-        this._draggable.connect('drag-end', () => this.emit('drag-end'));
+        this._draggable.connectObject(
+            'drag-begin', () => this.emit('drag-begin'),
+            'drag-cancelled', () => {
+                this._draggable._dragActor?.setTargetWidth(this.width);
+                this.emit('drag-end');
+            },
+            'drag-end', () => this.emit('drag-end'),
+            this);
     }
 
     get active() {
@@ -541,6 +547,7 @@ class BaseButton extends DashItemContainer {
 
     _onDestroy() {
         this._contextMenu.destroy();
+        this._contextMenu = null;
     }
 }
 
@@ -645,15 +652,15 @@ class AppButton extends BaseButton {
         this._windows = new Set();
         this._singleWindow = undefined;
 
-        this._menuManager = new PopupMenu.PopupMenuManager(this);
+        // the windows of the app, on left click
         this._menu = new ButtonMenu(this);
-        this._menu.connect('activate', this._onMenuActivate.bind(this));
-        this._menuManager.addMenu(this._menu);
+        this._menu.connectObject('activate', this._onMenuActivate.bind(this), this);
+        new PopupMenu.PopupMenuManager(this).addMenu(this._menu);
+        this.connect('destroy', this._destroyMenu.bind(this));
 
         this._contextMenu.setApp(this.app);
 
-        this._windowTracker = Shell.WindowTracker.get_default();
-        this._windowTracker.connectObject('notify::focus-app',
+        Shell.WindowTracker.get_default().connectObject('notify::focus-app',
             () => this._updateStyle(), this);
 
         this.app.connectObject('windows-changed',
@@ -698,8 +705,8 @@ class AppButton extends BaseButton {
     }
 
     _windowEnteredOrLeftMonitor(metaDisplay, monitorIndex, metaWindow) {
-        if (this._windowTracker.get_window_app(metaWindow) === this.app &&
-            monitorIndex === this._monitorIndex)
+        const app = Shell.WindowTracker.get_default().get_window_app(metaWindow);
+        if (app === this.app && monitorIndex === this._monitorIndex)
             this._updateVisibility();
     }
 
@@ -728,7 +735,7 @@ class AppButton extends BaseButton {
     }
 
     _isFocused() {
-        return this._windowTracker.focus_app === this.app;
+        return Shell.WindowTracker.get_default().focus_app === this.app;
     }
 
     _updateIconGeometry() {
@@ -794,9 +801,9 @@ class AppButton extends BaseButton {
             child._window.activate(global.get_current_time());
     }
 
-    _onDestroy() {
-        super._onDestroy();
+    _destroyMenu() {
         this._menu.destroy();
+        this._menu = null;
     }
 }
 
@@ -1480,6 +1487,7 @@ class WindowLists {
     destroy() {
         Main.layoutManager.disconnectObject(this);
         this._settings.disconnectObject(this);
+        this._settings = null;
 
         this._destroyWindowLists();
     }
