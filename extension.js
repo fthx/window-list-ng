@@ -705,8 +705,9 @@ class AppButton extends BaseButton {
     }
 
     _windowEnteredOrLeftMonitor(metaDisplay, monitorIndex, metaWindow) {
-        const app = Shell.WindowTracker.get_default().get_window_app(metaWindow);
-        if (app === this.app && monitorIndex === this._monitorIndex)
+        // windows being unmanaged are no longer tracked: if that stops the
+        // app, its button must stay visible to be animated out
+        if (this._windows.has(metaWindow) && monitorIndex === this._monitorIndex)
             this._updateVisibility();
     }
 
