@@ -33,7 +33,7 @@ import { LightStyle } from './lightStyle.js';
 import { PanelFree } from './panelFree.js';
 import { WorkspaceIndicator } from './workspaceIndicator.js';
 
-const ICON_TEXTURE_SIZE = 24;
+const ICON_TEXTURE_SIZE = 22;
 const DND_ACTIVATE_TIMEOUT = 500;
 
 const MIN_DRAG_UPDATE_INTERVAL = 500 * GLib.TIME_SPAN_MILLISECOND;
