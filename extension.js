@@ -858,10 +858,7 @@ class WindowList extends St.Widget {
         this._indicatorsBox = new St.BoxLayout({ x_align: Clutter.ActorAlign.END });
         box.add_child(this._indicatorsBox);
 
-        this._workspaceIndicator = new BottomWorkspaceIndicator({
-            baseStyleClass: 'window-list-workspace-indicator',
-            extension,
-        });
+        this._workspaceIndicator = new BottomWorkspaceIndicator(extension);
         this._indicatorsBox.add_child(this._workspaceIndicator.container);
 
         this._mutterSettings = new Gio.Settings({ schema_id: 'org.gnome.mutter' });

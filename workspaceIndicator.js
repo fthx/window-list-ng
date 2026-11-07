@@ -26,7 +26,7 @@ const TOOLTIP_ANIMATION_TIME = 150;
 
 const SCROLL_TIME = 100;
 
-let baseStyleClassName = '';
+const BASE_STYLE_CLASS = 'window-list-workspace-indicator';
 
 class WindowPreview extends St.Button {
     static {
@@ -35,7 +35,7 @@ class WindowPreview extends St.Button {
 
     constructor(window) {
         super({
-            style_class: `${baseStyleClassName}-window-preview`,
+            style_class: `${BASE_STYLE_CLASS}-window-preview`,
         });
 
         this._delegate = this;
@@ -468,12 +468,6 @@ class EditableMenuItem extends PopupMenu.PopupBaseMenuItem {
                 this._stopEditing();
             }
         });
-
-        global.stage.connectObject('notify::key-focus', () => {
-            const { keyFocus } = global.stage;
-            if (!keyFocus || !this.contains(keyFocus))
-                this._stopEditing();
-        }, this);
     }
 
     _switchActor(from, to) {
@@ -500,13 +494,21 @@ class EditableMenuItem extends PopupMenu.PopupBaseMenuItem {
 
         this._entry.clutter_text.set_selection(0, -1);
         this._entry.clutter_text.grab_key_focus();
+
+        // moving the key focus out of the item ends the edit
+        global.stage.connectObject('notify::key-focus', () => {
+            const { keyFocus } = global.stage;
+            if (!keyFocus || !this.contains(keyFocus))
+                this._stopEditing();
+        }, this);
     }
 
     _stopEditing() {
-        // also called on every key focus change
+        // called again when the edit button is unchecked below
         if (!this._editing)
             return;
         this._editing = false;
+        global.stage.disconnectObject(this);
 
         if (this.label.text !== this._entry.text) {
             this.label.text = this._entry.text;
@@ -524,7 +526,7 @@ class WorkspacesMenu extends PopupMenu.PopupMenu {
     constructor(sourceActor, extension) {
         super(sourceActor, 0.5, St.Side.TOP);
 
-        this.actor.add_style_class_name(`${baseStyleClassName}-menu`);
+        this.actor.add_style_class_name(`${BASE_STYLE_CLASS}-menu`);
 
         this._workspacesSection = new PopupMenu.PopupMenuSection();
 
@@ -623,18 +625,12 @@ export class WorkspaceIndicator extends PanelMenu.Button {
         GObject.registerClass(this);
     }
 
-    constructor(params = {}) {
+    constructor(extension) {
         super(0.5, 'Workspace Indicator', true);
-
-        const {
-            baseStyleClass = 'workspace-indicator',
-            extension,
-        } = params;
 
         this._settings = extension.getSettings();
 
-        baseStyleClassName = baseStyleClass;
-        this.add_style_class_name(baseStyleClassName);
+        this.add_style_class_name(BASE_STYLE_CLASS);
 
         this.setMenu(new WorkspacesMenu(this, extension));
 
