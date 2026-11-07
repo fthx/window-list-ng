@@ -1,0 +1,14 @@
+{
+  "name": "Window List NG",
+  "description": "Display a window list at the bottom of the screen.\n\nOptional features:\n- Bottom Overview: overview appears when hovering the bottom of any monitor.\n- Panel Free: hide top panel except in overview.\n- Light Style: switch default to light style.\n\nBased on Window List and Light Style (official GNOME extensions, @fmuellner) and on the Bottom Overview and Panel Free extensions (@fthx).\n\nThese extensions were written by hand, then hardened and integrated with the help of Claude Code.",
+  "shell-version": [
+    "51"
+  ],
+  "version-name": "51.0",
+  "url": "https://github.com/fthx/window-list-ng",
+  "uuid": "window-list-ng@fthx",
+  "settings-schema": "org.gnome.shell.extensions.window-list-ng",
+  "donations": {
+    "paypal": "fthx75"
+  }
+}

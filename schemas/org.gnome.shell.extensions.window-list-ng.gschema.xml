@@ -1,0 +1,78 @@
+<!--
+Window List NG
+based on the GNOME official extension by @fmuellner
+@fthx 2026
+
+SPDX-FileCopyrightText: 2016 Florian Müllner <fmuellner@gnome.org>
+
+SPDX-License-Identifier: GPL-2.0-or-later
+-->
+
+<schemalist>
+  <enum id="org.gnome.shell.extensions.window-list-ng.GroupingMode">
+    <value value="0" nick="never"/>
+    <value value="1" nick="auto"/>
+    <value value="2" nick="always"/>
+  </enum>
+  <schema id="org.gnome.shell.extensions.window-list-ng"
+          path="/org/gnome/shell/extensions/window-list-ng/">
+    <key name="enable-window-list" type="b">
+      <default>true</default>
+      <summary>Enable the window list</summary>
+      <description>
+        Whether to show the window list at the bottom of the screen.
+      </description>
+    </key>
+    <key name="enable-bottom-overview" type="b">
+      <default>true</default>
+      <summary>Enable Bottom Overview</summary>
+      <description>
+        Whether pushing the pointer against the bottom of a monitor
+        toggles the overview.
+      </description>
+    </key>
+    <key name="enable-panel-free" type="b">
+      <default>true</default>
+      <summary>Enable Panel Free</summary>
+      <description>
+        Whether to hide the top panel except in the overview.
+      </description>
+    </key>
+    <key name="enable-light-style" type="b">
+      <default>true</default>
+      <summary>Enable Light Style</summary>
+      <description>
+        Whether to switch the default style of the shell to light. A dark
+        style chosen in the system settings still takes precedence.
+      </description>
+    </key>
+    <key name="grouping-mode"
+         enum="org.gnome.shell.extensions.window-list-ng.GroupingMode">
+      <default>'never'</default>
+      <summary>When to group windows</summary>
+      <description>
+        Decides when to group windows from the same application on the
+        window list. Possible values are “never”, “auto” and “always”.
+      </description>
+    </key>
+    <key name="display-all-workspaces" type="b">
+      <default>false</default>
+      <summary>Show windows from all workspaces</summary>
+      <description>
+        Whether to show windows from all workspaces or only the current one.
+      </description>
+    </key>
+    <key name="show-on-all-monitors" type="b">
+      <default>true</default>
+      <summary>Show the window list on all monitors</summary>
+      <description>
+        Whether to show the window list on all connected monitors or
+        only on the primary one.
+      </description>
+    </key>
+    <key name="embed-previews" type="b">
+      <default>true</default>
+      <summary>Show workspace previews in window list</summary>
+    </key>
+  </schema>
+</schemalist>
