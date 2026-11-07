@@ -1501,9 +1501,6 @@ class WindowLists {
     }
 }
 
-// Each feature is enabled by a settings key. Features are objects with a
-// destroy() method that track their signals with themselves, never with
-// the extension, so that they can be enabled and disabled independently.
 const FEATURES = [
     ['enable-window-list', WindowLists],
     ['enable-bottom-overview', BottomOverview],
@@ -1537,11 +1534,10 @@ export default class WindowListExtension extends Extension {
     }
 
     disable() {
-        this._settings.disconnectObject(this);
-        this._settings = null;
-
-        // in reverse order of creation
         [...this._features.values()].reverse().forEach(feature => feature.destroy());
         this._features = null;
+
+        this._settings.disconnectObject(this);
+        this._settings = null;
     }
 }

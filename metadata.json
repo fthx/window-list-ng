@@ -4,7 +4,7 @@
   "shell-version": [
     "51"
   ],
-  "version-name": "51.2",
+  "version-name": "51.3",
   "url": "https://github.com/fthx/window-list-ng",
   "uuid": "window-list-ng@fthx",
   "settings-schema": "org.gnome.shell.extensions.window-list-ng",

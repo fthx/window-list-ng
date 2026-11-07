@@ -468,6 +468,8 @@ class EditableMenuItem extends PopupMenu.PopupBaseMenuItem {
                 this._stopEditing();
             }
         });
+
+        this.connect('destroy', this._onDestroy.bind(this));
     }
 
     _switchActor(from, to) {
@@ -519,6 +521,11 @@ class EditableMenuItem extends PopupMenu.PopupBaseMenuItem {
 
         this._switchActor(this._entry, this.label);
         this.navigate_focus(this, St.DirectionType.TAB_FORWARD, false);
+    }
+
+    _onDestroy() {
+        this._editing = false;
+        global.stage.disconnectObject(this);
     }
 }
 
