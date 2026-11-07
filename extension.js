@@ -217,7 +217,17 @@ class WindowTitle extends TitleWidget {
 
     _updateIcon() {
         const app = Shell.WindowTracker.get_default().get_window_app(this._metaWindow);
-        if (app) {
+        const wmClass = this._metaWindow.wm_class;
+
+        // a Chromium web app has an icon named as its windows, even when the
+        // window tracker gives them to the browser (sandboxed browser: snap)
+        if (wmClass?.startsWith('chrome-')) {
+            this._icon.child = new St.Icon({
+                gicon: Gio.ThemedIcon.new(wmClass),
+                fallback_gicon: app?.icon ?? null,
+                icon_size: ICON_TEXTURE_SIZE,
+            });
+        } else if (app) {
             this._icon.child = app.create_icon_texture(ICON_TEXTURE_SIZE);
         } else {
             this._icon.child = new St.Icon({
